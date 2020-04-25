@@ -1078,7 +1078,7 @@ static void read_encoders(slot_data_t *slot)
   int i, byteindex, byteindx2;
   double vel;                    // local temporary velocity
     union pos_tag {
-        signed long l;
+        int64_t l;
         struct byte_tag {
             signed char b0;
             signed char b1;
