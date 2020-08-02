@@ -33,6 +33,8 @@ from subprocess import Popen, PIPE
 sys.path.append('./wizards')
 import w_main
 
+import w_cut_recovery
+
 class wizards:
 
     def __init__(self, halcomp,builder,useropts):
@@ -44,6 +46,7 @@ class wizards:
         self.prefFile = self.i.find('EMC', 'MACHINE') + '.pref'
         self.gui = self.i.find('DISPLAY', 'DISPLAY').lower()
         self.configFile = self.i.find('EMC', 'MACHINE').lower() + '_wizards.cfg'
+        self.cutRecovering = False
         self.check_settings()
         self.set_theme()
         self.button_setup()
@@ -155,7 +158,25 @@ class wizards:
         bNum = int(button.get_name().split('button')[1])
         commands = self.iniButtonCode[bNum]
         if not commands: return
-        if 'change-consumables' in commands.lower():
+        if 'cut-recovery' in commands.lower() and hal.get_value('halui.program.is-paused'):
+            print 'open cut rec window'
+#            msg = Popen('python ./wizards/w_cut_recovery.py',stdout=PIPE,stderr=PIPE, shell=True)
+#            Popen('python ./wizards/w_cut_recovery.py',stdout=PIPE,stderr=PIPE, shell=True)
+
+            reload(w_cut_recovery)
+            cut_wiz = w_cut_recovery.recovery()
+            error = cut_wiz.create_widgets()
+            if error:
+                self.dialog_error('Error in cut recovery dialog')
+
+            hal.set_p('plasmac.cut-recovery', '0')
+
+    def on_button_pressed(self, button):
+        bNum = int(button.get_name().split('button')[1])
+        print button.get_name, bNum, 'pressed'
+        commands = self.iniButtonCode[bNum]
+        if not commands: return
+        elif 'change-consumables' in commands.lower():
             self.consumable_change_setup()
             if hal.get_value('axis.x.eoffset-counts') or hal.get_value('axis.y.eoffset-counts'):
                 hal.set_p('plasmac.consumable-change', '0')
@@ -318,6 +339,18 @@ class wizards:
         self.buttonRed.bg[gtk.STATE_PRELIGHT] = gtk.gdk.color_parse('red')
 
     def periodic(self):
+
+        # print 'periodic 0'
+        # 
+        # if not hal.get_value('plasmac:program-is-paused') and hal.get_value('plasmac.cut-recovery'):
+        #     hal.set_p('plasmac.cut-recovery', '0')
+        # if hal.get_value('plasmac.cut-recovery') and \
+        #   (hal.get_value('plasmac.state-out') == 1 or \
+        #    hal.get_value('plasmac.state-out') == 24):
+        #     self.clear_offsets()
+        #     print('Error caused cut recovery to exit...')
+        #     raise SystemExit()
+
         self.s.poll()
         isIdleHomed = True
         isIdleOn = True
@@ -335,7 +368,16 @@ class wizards:
             if 'load' in self.iniButtonCode[n]:
                 pass
             elif 'change-consumables' in self.iniButtonCode[n]:
-                if hal.get_value('halui.program.is-paused') and hal.get_value('plasmac.stop-type-out') > 1:
+                if hal.get_value('halui.program.is-paused') and \
+                   hal.get_value('plasmac.stop-type-out') > 1 and \
+                   not hal.get_value('plasmac.cut-recovering'):
+                    self.builder.get_object('button' + str(n)).set_sensitive(True)
+                else:
+                    self.builder.get_object('button' + str(n)).set_sensitive(False)
+            elif 'cut-recovery' in self.iniButtonCode[n]:
+                if hal.get_value('halui.program.is-paused') and \
+                   hal.get_value('plasmac.motion-type') > 1 and \
+                   not hal.get_value('plasmac.consumable-changing'):
                     self.builder.get_object('button' + str(n)).set_sensitive(True)
                 else:
                     self.builder.get_object('button' + str(n)).set_sensitive(False)
