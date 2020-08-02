@@ -62,6 +62,8 @@ pin in  bit     homed                       "machine is homed";
 pin in  bit     kerfcross_enable            "enable kerf crossing [mode 0 & mode 1]";
 pin in  float   kerfcross_override          "kerf crossing threshold override as a percentage";
 pin in  float   lowpass_frequency           "lowpass cutoff frequency for arc voltage output";
+pin in  bit     mesh_enable_0               "enable mesh cutting mode input 0";
+pin in  bit     mesh_enable_1               "enable mesh cutting mode input 0";
 pin in  s32     mode                        "operating mode";
 pin in  s32     motion_type                 "motion type, connect to motion.motion-type";
 pin in  bit     move_down                   "external thc down switch [mode 2])";
@@ -234,6 +236,7 @@ variable int    zero_target;                /* zero height target offset */
 /* PARAMETERS */
 param rw bit     debug_print = FALSE         "print debug messages";
 param rw s32     kerf_errors_max = 2         "allowable kerfcross threshold errors";
+param rw bit     mesh_arc_ok = FALSE         "don't require arc ok for mesh mode";
 
 function _;
 
@@ -471,7 +474,7 @@ FUNCTION(_) {
                                               "program is paused.\n");
                 probe_inhibit = TRUE;
                 state = MAX_HEIGHT;
-            }else if(state > ARC_OK && !arc_ok_out && torch_enable && !torch_off){ ;
+            }else if(state > ARC_OK && !arc_ok_out && torch_enable && !torch_off && !(mesh_enable_0 || mesh_enable_1)){ ;
                 torch_on = FALSE;
                 program_pause = TRUE;
                 stop_type = PAUSE;
@@ -919,7 +922,7 @@ FUNCTION(_) {
                 restart_timer = restart_delay;
                 arc_starts += 1;
                 state = TORCH_ON;
-            }else if(arc_ok_out && tool != SPOTTING){
+            }else if((arc_ok_out || (mesh_arc_ok && (mesh_enable_0 || mesh_enable_1))) && tool != SPOTTING){
                     pierce_timer = pierce_delay;
                     state = PIERCE_DELAY;
             }
