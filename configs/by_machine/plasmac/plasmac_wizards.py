@@ -159,11 +159,11 @@ class wizards:
         commands = self.iniButtonCode[bNum]
         if not commands: return
         if 'cut-recovery' in commands.lower() and hal.get_value('halui.program.is-paused'):
-            print 'open cut rec window'
+#            print 'open cut rec window'
 #            msg = Popen('python ./wizards/w_cut_recovery.py',stdout=PIPE,stderr=PIPE, shell=True)
 #            Popen('python ./wizards/w_cut_recovery.py',stdout=PIPE,stderr=PIPE, shell=True)
 
-            reload(w_cut_recovery)
+#            reload(w_cut_recovery)
             cut_wiz = w_cut_recovery.recovery()
             error = cut_wiz.create_widgets()
             if error:
@@ -173,7 +173,7 @@ class wizards:
 
     def on_button_pressed(self, button):
         bNum = int(button.get_name().split('button')[1])
-        print button.get_name, bNum, 'pressed'
+#        print button.get_name, bNum, 'pressed'
         commands = self.iniButtonCode[bNum]
         if not commands: return
         elif 'change-consumables' in commands.lower():
@@ -350,6 +350,10 @@ class wizards:
         #     self.clear_offsets()
         #     print('Error caused cut recovery to exit...')
         #     raise SystemExit()
+
+        if hal.get_value('plasmac:program-is-idle'):
+            hal.set_p('plasmac.cut-recovery', '0')
+
 
         self.s.poll()
         isIdleHomed = True

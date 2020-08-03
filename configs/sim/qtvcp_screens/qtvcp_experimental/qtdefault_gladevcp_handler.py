@@ -10,9 +10,7 @@ from PyQt5 import QtCore, QtWidgets
 from qtvcp.widgets.mdi_line import MDILine as MDI_WIDGET
 from qtvcp.widgets.gcode_editor import GcodeEditor as GCODE
 from qtvcp.lib.keybindings import Keylookup
-from qtvcp.lib.toolbar_actions import ToolBarActions
-from qtvcp.widgets.stylesheeteditor import  StyleSheetEditor as SSE
-from qtvcp.core import Status, Action, Info
+from qtvcp.core import Status, Action
 
 # Set up logging
 from qtvcp import logger
@@ -28,7 +26,6 @@ LOG = logger.getLogger(__name__)
 KEYBIND = Keylookup()
 STATUS = Status()
 ACTION = Action()
-INFO = Info()
 ###################################
 # **** HANDLER CLASS SECTION **** #
 ###################################
@@ -44,10 +41,6 @@ class HandlerClass:
         self.hal = halcomp
         self.w = widgets
         self.PATHS = paths
-        self.STYLEEDITOR = SSE(widgets,paths)
-        self.picked_line = None
-        STATUS.connect('general',self.return_value)
-        STATUS.connect('graphics-line-selected', self.set_picked_line)
 
     ##########################################
     # Special Functions called from QTSCREEN
@@ -57,7 +50,7 @@ class HandlerClass:
     # the widgets are instantiated.
     # the HAL pins are built but HAL is not set ready
     def initialized__(self):
-        KEYBIND.add_call('Key_F12','on_keycall_F12')
+        pass
 
     def processed_key_event__(self,receiver,event,is_pressed,key,code,shift,cntrl):
         # when typing in MDI, we don't want keybinding to call functions
@@ -78,7 +71,7 @@ class HandlerClass:
                     flag = True
                     break
                 if isinstance(receiver2, GCODE):
-                    flag = False
+                    flag = True
                     break
                 receiver2 = receiver2.parent()
 
@@ -99,55 +92,23 @@ class HandlerClass:
                     event.accept()
                     return True
 
-        # ok if we got here then try keybindings function calls
-        # KEYBINDING will call functions from handler file as
-        # registered by KEYBIND.add_call(KEY,FUNCTION) above
-        return KEYBIND.manage_function_calls(self,event,is_pressed,key,shift,cntrl)
+        # ok if we got here then try keybindings
+        try:
+            return KEYBIND.call(self,event,is_pressed,shift,cntrl)
+        except NameError as e:
+            LOG.debug('Exception in KEYBINDING: {}'.format (e))
+        except Exception as e:
+            LOG.debug('Exception in KEYBINDING:', exc_info=e)
+            print 'Error in, or no function for: %s in handler file for-%s'%(KEYBIND.convert(event),key)
+            return False
 
     ########################
     # callbacks from STATUS #
     ########################
-    # process the STATUS return message for run-from-line
-    def return_value(self, obj, message):
-        num = message['RETURN']
-        code = bool(message['ID'] == '_RunFromLine_')
-        name = bool(message['NAME'] == 'CALCULATOR')
-        if num is not None and code and name:
-            ACTION.RUN(int(num))
-
-    def set_picked_line(self, obj, line):
-        self.picked_line = line
 
     #######################
     # callbacks from form #
     #######################
-    def full_screen(self, state):
-        if state:
-            self.w.stackedWidget_0.setCurrentIndex(1)
-            self.w.widgetswitcher.show_id_widget(1)
-        else:
-            self.w.stackedWidget_0.setCurrentIndex(0)
-            self.w.widgetswitcher.show_id_widget(0)
-
-    def slow_jog_slider_changed(self, rate):
-        if self.w.pbtn_jog_rate_slow.isChecked():
-            ACTION.SET_JOG_RATE(rate)
-    def fast_jog_slider_changed(self, rate):
-        if self.w.pbtn_jog_rate_fast.isChecked():
-            ACTION.SET_JOG_RATE(rate)
-
-    def set_slow_rate(self, state):
-        if state:
-            ACTION.SET_JOG_RATE(self.w.scrb_jog_linear_slow.value())
-    def set_fast_rate(self, state):
-        if state:
-            ACTION.SET_JOG_RATE(self.w.scrb_jog_linear_fast.value())
-
-    def run_from_line_clicked(self):
-        mess = {'NAME':'CALCULATOR','ID':'_RunFromLine_',
-             'PRELOAD':self.picked_line,
-               'TITLE':'Run From Line Dialog'}
-        ACTION.CALL_DIALOG('dialog-request', mess)
 
     #####################
     # general functions #
@@ -193,7 +154,7 @@ class HandlerClass:
             if STATUS.stat.interp_state == linuxcnc.INTERP_IDLE:
                 self.w.close()
             else:
-                ACTION.ABORT()
+                self.cmnd.abort()
 
     # Linear Jogging
     def on_keycall_XPOS(self,event,state,shift,cntrl):
@@ -221,10 +182,6 @@ class HandlerClass:
     def on_keycall_ANEG(self,event,state,shift,cntrl):
         pass
         #self.kb_jog(state, 3, -1, shift, linear=False)
-
-    def on_keycall_F12(self,event,state,shift,cntrl):
-        if state:
-            self.STYLEEDITOR.load_dialog()
 
     ###########################
     # **** closing event **** #

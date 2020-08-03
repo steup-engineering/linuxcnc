@@ -30,19 +30,29 @@ import time
 class recovery:
 
     def __init__(self):
-        print('cut rec started')
+#        print('cut rec started')
         self.i = linuxcnc.ini(os.environ['INI_FILE_NAME'])
         self.s = linuxcnc.stat()
         self.c = linuxcnc.command()
+
         try:
-            self.h = hal.component('dummy')
-            self.h.ready()
+            # we need this to connect to hal
+            if not hal.component_exists('dummy'):
+#                print 'make dummy'
+                self.h = hal.component('dummy')
+                self.h.ready()
+            # else:
+            #     print 'dummy not created yet'
+        # try:
+        #     self.h = hal.component('dummy')
+        #     self.h.ready()
         except:
             pass
         if not hal.get_value('halui.program.is-paused'):
             print('Cannot load cut recovery because program is not paused')
             #gtk.main_quit()
-            # self.W.destroy()
+            #self.W.destroy()
+            #raise SystemExit()
         # self.W = gtk.Window()
         # self.W.set_title('PlasmaC Cut Recovery')
         # self.W.set_position(gtk.WIN_POS_MOUSE)
@@ -61,10 +71,11 @@ class recovery:
         self.zMin = float(self.i.find('AXIS_Z', 'MIN_LIMIT'))
         self.zMax = float(self.i.find('AXIS_Z', 'MAX_LIMIT'))
         self.cancelWait = False
+        self.resumeWait = False
         gobject.timeout_add(200, self.periodic)
         # self.W.show_all()
 
-        print('cut rec initialized')
+#        print('cut rec initialized')
 
 #        gobject.timeout_add(200, self.periodic)
 
@@ -78,23 +89,45 @@ class recovery:
         #     print('Error caused cut recovery to exit...')
         #     gtk.main_quit()
 
-        if self.cancelWait and not hal.get_value('plasmac.cut-recovery'):
+        if self.cancelWait and not hal.get_value('plasmac.x-offset-counts') and not hal.get_value('plasmac.y-offset-counts'):
+            self.cancelWait = False
+            hal.set_p('plasmac.cut-recovery', '0')
+            #raise SystemExit()
             #gtk.main_quit()
+#            print 'quit from cancel'
             self.W.destroy()
 
-        print self.W.get_property('visible')
-        if self.W.get_property('visible') and not hal.get_value('plasmac:program-is-paused'):
+
+        if hal.get_value('plasmac.state-out') == 11:
+            hal.set_p('plasmac.cut-recovery', '0')
+
+#        if self.resumeWait and not hal.get_value('plasmac.x-offset-counts') and not hal.get_value('plasmac.y-offset-counts') and hal.get_value('plasmac.state-out') < 23:
+        if self.resumeWait and hal.get_value('plasmac.state-out') == 11:
+            self.resumeWait = False
+            hal.set_p('plasmac.cut-recovery', '0')
+            #raise SystemExit()
+            #gtk.main_quit()
+#            print 'quit from resume'
+            self.W.destroy()
+
+#        print 'window visible =', self.W.get_property('visible')
+        if self.W.get_property('visible') and not hal.get_value('plasmac:program-is-paused') and hal.get_value('plasmac.state-out') < 23:
 #            hal.get_value('plasmac.state-out') == 11:
-           self.W.destroy()
+            #raise SystemExit()
+#            hal.set_p('plasmac.cut-recovery', '0') #killing resume
+#            print 'quit from not being paused 1'
+            self.W.destroy()
 
         if hal.get_value('plasmac.cut-recovery'):
             if not hal.get_value('plasmac:program-is-paused'):
-                hal.set_p('plasmac.cut-recovery', '0')
+#                hal.set_p('plasmac.cut-recovery', '0')
             # if hal.get_value('plasmac.state-out') == 1 or hal.get_value('plasmac.state-out') == 24:
             #     self.clear_offsets()
             #     print('Error caused cut recovery to exit...')
             #     gtk.main_quit()
-            #     self.W.destroy()
+            #     raise SystemExit()
+#                print 'quit from not bein paused 2'
+                self.W.destroy()
 
         if hal.get_value('plasmac.x-offset') or hal.get_value('plasmac.y-offset'):
             self.feed_disable()
@@ -265,26 +298,31 @@ class recovery:
             self.dialog_error(msg)
             self.clear_offsets()
 #            gtk.main_quit()
-            self.W.destroy()
+            #self.W.destroy()
+            raise SystemExit()
         self.c.auto(linuxcnc.AUTO_RESUME)
         while not hal.get_value('halui.program.is-running'):
             pass
         self.clear_offsets()
-        hal.set_p('plasmac.cut-recovery', '0')
+        self.resumeWait = True
+#        hal.set_p('plasmac.cut-recovery', '0')
 #        gtk.main_quit()
-        print 'window destroy'
-        self.W.destroy()
+#        print 'window destroy'
+        #self.W.destroy()
+#        raise SystemExit()
 
     def cancel_pressed(self, widget):
         self.clear_offsets()
 #        hal.set_p('plasmac.cut-recovery', '0')
         self.cancelWait = True
 #        gtk.main_quit()
+#        raise SystemExit()
 
     def on_window_delete_event(self,window,event):
         self.clear_offsets()
 #        gtk.main_quit()
-        self.W.destroy()
+        #self.W.destroy()
+        raise SystemExit()
 
     def clear_offsets(self):
         hal.set_p('plasmac.x-offset', '0')
@@ -382,7 +420,7 @@ class recovery:
         self.T.attach(self.cancel, 4, 5, 10, 12)
         hal.set_p('plasmac_run.preview-tab', '1')
 
-        print 'widgets created'
+#        print 'widgets created'
         self.W.show_all()
 #recovery()
 #gtk.main()
