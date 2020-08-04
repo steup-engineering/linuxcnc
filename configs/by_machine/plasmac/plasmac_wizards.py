@@ -154,7 +154,7 @@ class wizards:
             except:
                 print('Could not load image for custom user button #{}'.format(button))
 
-    def on_button_clicked(self, button):
+    def on_button_pressed(self, button):
         bNum = int(button.get_name().split('button')[1])
         commands = self.iniButtonCode[bNum]
         if not commands: return
@@ -163,12 +163,7 @@ class wizards:
             error = cut_wiz.create_widgets()
             if error:
                 self.dialog_error('Error in cut recovery dialog')
-            hal.set_p('plasmac.cut-recovery', '0')
-
-    def on_button_pressed(self, button):
-        bNum = int(button.get_name().split('button')[1])
-        commands = self.iniButtonCode[bNum]
-        if not commands: return
+#            hal.set_p('plasmac.cut-recovery', '0')
         elif 'change-consumables' in commands.lower():
             self.consumable_change_setup()
             if hal.get_value('axis.x.eoffset-counts') or hal.get_value('axis.y.eoffset-counts'):
