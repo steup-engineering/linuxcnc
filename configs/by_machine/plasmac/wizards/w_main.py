@@ -27,6 +27,7 @@ import math
 import linuxcnc
 import shutil
 import hal
+import gobject
 from subprocess import Popen,PIPE
 import gremlin
 
@@ -68,6 +69,13 @@ class main_wiz:
         self.fTmp = '{}/temp.ngc'.format(self.tmpDir)
         self.fNgc = '{}/shape.ngc'.format(self.tmpDir)
         self.fNgcBkp = '{}/backup.ngc'.format(self.tmpDir)
+        gobject.timeout_add(100, self.periodic)
+
+    def periodic(self):
+        # exit if linuxcnc not running
+        if not hal.component_exists('plasmac_run'):
+            self.W.destroy()
+        return True
 
     def dialog_error(self, wizard, error):
         md = gtk.MessageDialog(self.W, 

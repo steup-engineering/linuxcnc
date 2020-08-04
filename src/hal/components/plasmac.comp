@@ -983,7 +983,6 @@ FUNCTION(_) {
                         x_velocity = fabs(cut_feed_rate * velocity_scale * cos(angle_x_y));
                         y_velocity = fabs(cut_feed_rate * velocity_scale * sin(angle_x_y));
                         state = CUT_RECOVERY_OFF;
-//                        state = CUT_RECOVERY_OFF;
                     }else{
                         feed_hold = FALSE;
                         thc_delay_timer = thc_delay;
@@ -1286,10 +1285,7 @@ FUNCTION(_) {
                             x_velocity = fabs(cut_feed_rate * velocity_scale * cos(angle_x_y));
                             y_velocity = fabs(cut_feed_rate * velocity_scale * sin(angle_x_y));
                             state = CUT_RECOVERY_OFF;
-
                             cut_recovering = FALSE;
-
-//                            state = CUT_RECOVERY_ON;
                         }
                     }
                 }
@@ -1556,16 +1552,6 @@ FUNCTION(_) {
                 y_offset_counts = 0;
             }
             if(!x_offset_counts && !y_offset_counts){
-                // if(cut_recovering && cut_recovery){
-                //     cut_recovering = FALSE;
-                //     feed_hold = FALSE;
-                //     thc_delay_timer = thc_delay;
-                //     state = CUT;
-                // }else{
-                //     cut_recovering = FALSE;
-                //     state = IDLE;
-                // }
-//                if(cut_recovering){
                 if(cut_recovery){
                     cut_recovering = FALSE;
                     feed_hold = FALSE;
