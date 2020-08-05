@@ -55,12 +55,13 @@ class main_wiz:
         self.savePath = self.i.find('DISPLAYaqw', 'PROGRAM_PREFIX') or \
                         '{}/linuxcnc/nc_files'.format(os.path.expanduser("~"))
         self.configFile = '{}_wizards.cfg'.format(self.i.find('EMC', 'MACHINE').lower())
-        self.scale = 0.039370 if self.i.find('TRAJ', 'LINEAR_UNITS').lower() == 'inch' else 1.0
+        # glcanon has a reversed scale to just about everything else...
+        self.scale = 1.0 if self.i.find('TRAJ', 'LINEAR_UNITS').lower() == 'inch' else 0.03937000787402
         self.preview = preview(self.i)
         self.preview.program_alpha = True
         self.preview.set_cone_basesize(0.1)
         self.preview.mouse_btn_mode = 6
-        if self.scale == 0.039370:
+        if self.scale == 1.0:
             self.preview.metric_units = False
         self.rowSpace = 2
         self.tmpDir = ('/tmp/plasmac_wizards')
@@ -144,57 +145,57 @@ class main_wiz:
     def on_settings_clicked(self, widget):
         reload(w_settings)
         settings = w_settings.settings_wiz()
-        settings.settings_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace)
+        settings.settings_show(self)
 
     def on_line_clicked(self, widget):
         reload(w_line)
         line = w_line.line_wiz()
-        line.line_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace - 2, self.xOrigin, self.yOrigin)
+        line.line_show(self)
 
     def on_circle_clicked(self, widget):
         reload(w_circle)
         circle = w_circle.circle_wiz()
-        circle.circle_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, self.xOrigin, self.yOrigin)
+        circle.circle_show(self)
 
     def on_triangle_clicked(self, widget):
         reload(w_triangle)
         triangle = w_triangle.triangle_wiz()
-        triangle.triangle_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, self.xOrigin, self.yOrigin)
+        triangle.triangle_show(self)
 
     def on_rectangle_clicked(self, widget):
         reload(w_rectangle)
         rectangle = w_rectangle.rectangle_wiz()
-        rectangle.rectangle_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, self.xOrigin, self.yOrigin)
+        rectangle.rectangle_show(self)
 
     def on_polygon_clicked(self, widget):
         reload(w_polygon)
         polygon = w_polygon.polygon_wiz()
-        polygon.polygon_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace - 2, self.xOrigin, self.yOrigin)
+        polygon.polygon_show(self)
 
     def on_bolt_circle_clicked(self, widget):
         reload(w_bolt_circle)
         bolt_circle = w_bolt_circle.bolt_circle_wiz()
-        bolt_circle.bolt_circle_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, self.xOrigin, self.yOrigin)
+        bolt_circle.bolt_circle_show(self)
 
     def on_slot_clicked(self, widget):
         reload(w_slot)
         slot = w_slot.slot_wiz()
-        slot.slot_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, self.xOrigin, self.yOrigin)
+        slot.slot_show(self)
 
     def on_star_clicked(self, widget):
         reload(w_star)
         star = w_star.star_wiz()
-        star.star_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, self.xOrigin, self.yOrigin)
+        star.star_show(self)
 
     def on_gusset_clicked(self, widget):
         reload(w_gusset)
         gusset = w_gusset.gusset_wiz()
-        gusset.gusset_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, self.xOrigin, self.yOrigin)
+        gusset.gusset_show(self)
 
     def on_sector_clicked(self, widget):
         reload(w_sector)
         sector = w_sector.sector_wiz()
-        sector.sector_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, self.xOrigin, self.yOrigin)
+        sector.sector_show(self)
 
     def on_rotate_clicked(self, widget):
         with open(self.fNgc) as inFile:
@@ -204,7 +205,7 @@ class main_wiz:
                     return
         reload(w_rotate)
         rotate = w_rotate.rotate_wiz()
-        rotate.rotate_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace)
+        rotate.rotate_show(self)
 
     def on_array_clicked(self, widget):
         with open(self.fNgc) as inFile:
@@ -213,16 +214,16 @@ class main_wiz:
                     self.dialog_error('ARRAY', 'The empty file: {}\n\ncannot be arrayed'.format(os.path.basename(self.fNgc)))
                     return
                 elif '(wizard' in line:
-                    mode = 'wizard'
+                    self.arrayMode = 'wizard'
                     break
                 elif '#<ucs_' in line:
                     self.dialog_error('ARRAY', 'This existing array: {}\n\ncannot be arrayed'.format(os.path.basename(self.fNgc)))
                     return
                 else:
-                    mode = 'external'
+                    self.arrayMode = 'external'
         reload(w_array)
         array = w_array.array_wiz()
-        array.array_show(self, self.entry_box, self.fNgc, self.fNgcBkp, self.fTmp, self.rowSpace, mode)
+        array.array_show(self)
 
     def on_send_clicked(self, widget):
         shutil.copyfile(self.fNgcBkp, self.fNgc)
@@ -234,15 +235,12 @@ class main_wiz:
             self.c.program_open(self.fNgc)
         else:
             print('Unknown GUI in .ini file')
-        print 'send to gui'
         self.W.destroy()
 
     def on_quit_clicked(self, widget):
-        print 'quit'
         self.W.destroy()
 
     def on_delete_event(self, window, event):
-        print 'delete_event\n'
         self.W.destroy()
 
     def remove_temp_files(self):
@@ -321,9 +319,9 @@ class main_wiz:
                 buttons[bunames.index(wizard)].set_image(image)
             top.add(buttons[bunames.index(wizard)])
         right.add(self.preview)
-        self.entry_box = gtk.Table(15, 5, True)
-        self.entry_box.set_row_spacings(6)
-        self.left.pack_start(self.entry_box, expand = False, fill = True)
+        self.entries = gtk.Table(15, 5, True)
+        self.entries.set_row_spacings(6)
+        self.left.pack_start(self.entries, expand = False, fill = True)
         spaceLabel = gtk.Label()
         self.left.pack_start(spaceLabel, expand = True, fill = True)
         self.button_box = gtk.Table(1, 5, True)
@@ -366,7 +364,7 @@ class main_wiz:
                         wHeight = 0
                 elif line.startswith('grid-size'):
                     try:
-                        gSize = float(line.strip().split('=')[1])
+                        gSize = float(line.strip().split('=')[1]) * self.scale
                     except:
                         gSize = 0
         if wWidth and wHeight:
