@@ -359,9 +359,10 @@ class wizards:
                 elif 'cut-recovery' in self.iniButtonCode[n]:
                     if hal.get_value('halui.program.is-paused') and \
                        hal.get_value('plasmac.motion-type') > 1 and \
-                       not hal.get_value('plasmac.consumable-changing') and \
-                       not hal.get_value('plasmac.cut-recovery') and \
-                       not hal.get_value('plasmac.cut-recovering'):
+                       not hal.get_value('plasmac.consumable-changing'):
+                       # not hal.get_value('plasmac.consumable-changing') and \
+                       # not hal.get_value('plasmac.cut-recovery') and \
+                       # not hal.get_value('plasmac.cut-recovering'):
                         self.builder.get_object('button' + str(n)).set_sensitive(True)
                     else:
                         self.builder.get_object('button' + str(n)).set_sensitive(False)

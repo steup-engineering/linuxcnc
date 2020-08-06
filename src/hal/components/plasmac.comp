@@ -1240,6 +1240,8 @@ FUNCTION(_) {
                     height_ovr_old = 0;
                     if(consumable_change){
                         state = CONSUMABLE_CHANGE_ON;
+                    }else if(cut_recovery){
+                        state = CUT_RECOVERY_ON;
                     }else{
                         state = FINISH;
                     }
@@ -1339,7 +1341,11 @@ FUNCTION(_) {
                 if(program_is_paused && paused_motion_timer <= 0){
                     paused_motion = FALSE;
                     adaptive_feed = 1;
-                    state = IDLE;
+                    if(cut_recovery){
+                        state = CUT_RECOVERY_ON;
+                    }else{
+                        state = IDLE;
+                    }
                 }
             }
             break;
@@ -1533,6 +1539,9 @@ FUNCTION(_) {
                 y_velocity = fabs(cut_feed_rate * velocity_scale * sin(angle_x_y));
                 cut_recovering = FALSE;
                 state = CUT_RECOVERY_OFF;
+            }
+            if(paused_motion_speed){
+                state = PAUSED_MOTION;
             }
             break;
         case CUT_RECOVERY_OFF:

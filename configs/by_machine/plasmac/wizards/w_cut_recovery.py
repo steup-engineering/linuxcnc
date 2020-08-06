@@ -61,10 +61,16 @@ class recovery:
         gobject.timeout_add(200, self.periodic)
 
     def periodic(self):
+
+        # if we are not paused the we have resumed
+        if self.resumeWait and not hal.get_value('plasmac.x-offset-counts') and not hal.get_value('plasmac.y-offset-counts'):
+            self.resumeWait = False
+
+
         # hide if required
-        if hal.get_value('plasmac.state-out') <23 and \
-           (hal.get_value('plasmac.cut-recovery') or hal.get_value('plasmac.cut-recovering')):
-           self.W.hide()
+        # if hal.get_value('plasmac.state-out') < 23 and \
+        #    (hal.get_value('plasmac.cut-recovery') or hal.get_value('plasmac.cut-recovering')):
+        #    self.W.hide()
         # if we are stopped and the offsets are cleared then we should exit
         if hal.get_value('plasmac:program-is-idle') and not hal.get_value('plasmac.x-offset-counts') and not hal.get_value('plasmac.y-offset-counts'):
             hal.set_p('plasmac.cut-recovery', '0')
@@ -81,11 +87,16 @@ class recovery:
             self.exit()
             return False
         # hide/show the reverse run controls
-        if hal.get_value('plasmac.x-offset') or hal.get_value('plasmac.y-offset'):
+        if hal.get_value('plasmac.x-offset-counts') or hal.get_value('plasmac.y-offset-counts'):
             self.feed_disable()
+            # if self.resumeWait:
+            if hal.get_value('plasmac.state-out') < 23 :
+                self.buttons_disable()
         else:
             if not self.cancelWait or not self.resumeWait:
                 self.feed_enable()
+                self.buttons_enable()
+        
         return True
 
     def dialog_error(self, error):
@@ -245,7 +256,7 @@ class recovery:
         self.s.poll()
         if not self.s.paused:
             return
-        self.W.hide()
+        # self.W.hide()
         if self.s.task_mode != linuxcnc.MODE_AUTO:
             msg = 'LinuxCNC is not in auto mode'
             self.dialog_error(msg)
@@ -253,8 +264,8 @@ class recovery:
         self.c.auto(linuxcnc.AUTO_RESUME)
         while not hal.get_value('halui.program.is-running'):
             pass
-        self.clear_offsets()
         self.resumeWait = True
+        self.clear_offsets()
 
     def cancel_pressed(self, widget):
         self.W.hide()
@@ -283,9 +294,33 @@ class recovery:
         self.feed.set_sensitive(False)
         self.fwd.set_sensitive(False)
 
+    def buttons_enable(self):
+        self.XminusYplus.set_sensitive(True)
+        self.Yplus.set_sensitive(True)
+        self.XplusYplus.set_sensitive(True)
+        self.Xminus.set_sensitive(True)
+        self.Xplus.set_sensitive(True)
+        self.XminusYminus.set_sensitive(True)
+        self.Yminus.set_sensitive(True)
+        self.XplusYminus.set_sensitive(True)
+        self.resume.set_sensitive(True)
+        self.cancel.set_sensitive(True)
+
+    def buttons_disable(self):
+        self.XminusYplus.set_sensitive(False)
+        self.Yplus.set_sensitive(False)
+        self.XplusYplus.set_sensitive(False)
+        self.Xminus.set_sensitive(False)
+        self.Xplus.set_sensitive(False)
+        self.XminusYminus.set_sensitive(False)
+        self.Yminus.set_sensitive(False)
+        self.XplusYminus.set_sensitive(False)
+        self.resume.set_sensitive(False)
+        self.cancel.set_sensitive(False)
+
     def create_widgets(self):
         self.W = gtk.Window()
-        self.W.set_title('PlasmaC Cut Recovery')
+        self.W.set_title('Cut Recovery')
         self.W.set_position(gtk.WIN_POS_MOUSE)
         self.W.set_keep_above(True)
         self.W.connect('delete_event', self.on_window_delete_event)
