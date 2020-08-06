@@ -61,6 +61,10 @@ class recovery:
         gobject.timeout_add(200, self.periodic)
 
     def periodic(self):
+        # hide if required
+        if hal.get_value('plasmac.state-out') <23 and \
+           (hal.get_value('plasmac.cut-recovery') or hal.get_value('plasmac.cut-recovering')):
+           self.W.hide()
         # if we are stopped and the offsets are cleared then we should exit
         if hal.get_value('plasmac:program-is-idle') and not hal.get_value('plasmac.x-offset-counts') and not hal.get_value('plasmac.y-offset-counts'):
             hal.set_p('plasmac.cut-recovery', '0')
@@ -80,7 +84,8 @@ class recovery:
         if hal.get_value('plasmac.x-offset') or hal.get_value('plasmac.y-offset'):
             self.feed_disable()
         else:
-            self.feed_enable()
+            if not self.cancelWait or not self.resumeWait:
+                self.feed_enable()
         return True
 
     def dialog_error(self, error):
@@ -240,6 +245,7 @@ class recovery:
         self.s.poll()
         if not self.s.paused:
             return
+        self.W.hide()
         if self.s.task_mode != linuxcnc.MODE_AUTO:
             msg = 'LinuxCNC is not in auto mode'
             self.dialog_error(msg)
@@ -251,6 +257,7 @@ class recovery:
         self.resumeWait = True
 
     def cancel_pressed(self, widget):
+        self.W.hide()
         self.clear_offsets()
         self.cancelWait = True
 

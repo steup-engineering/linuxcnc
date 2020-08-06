@@ -158,7 +158,10 @@ class wizards:
         bNum = int(button.get_name().split('button')[1])
         commands = self.iniButtonCode[bNum]
         if not commands: return
-        if 'cut-recovery' in commands.lower() and hal.get_value('halui.program.is-paused'):
+        if 'cut-recovery' in commands.lower() and \
+           hal.get_value('halui.program.is-paused') and \
+           not hal.get_value('plasmac.cut-recovery') and \
+           not hal.get_value('plasmac.cut-recovering'):
             cut_wiz = w_cut_recovery.recovery()
             error = cut_wiz.create_widgets()
             if error:
@@ -356,7 +359,9 @@ class wizards:
                 elif 'cut-recovery' in self.iniButtonCode[n]:
                     if hal.get_value('halui.program.is-paused') and \
                        hal.get_value('plasmac.motion-type') > 1 and \
-                       not hal.get_value('plasmac.consumable-changing'):
+                       not hal.get_value('plasmac.consumable-changing') and \
+                       not hal.get_value('plasmac.cut-recovery') and \
+                       not hal.get_value('plasmac.cut-recovering'):
                         self.builder.get_object('button' + str(n)).set_sensitive(True)
                     else:
                         self.builder.get_object('button' + str(n)).set_sensitive(False)
