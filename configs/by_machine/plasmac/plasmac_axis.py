@@ -872,7 +872,9 @@ def user_live_update():
         w(ftorch + '.torch-button','configure','-state','normal')
     else:
         w(ftorch + '.torch-button','configure','-state','disabled')
-    if hal.get_value('halui.program.is-paused')  or hal.get_value('plasmac.paused-motion-speed'):
+    if (hal.get_value('halui.program.is-paused') or \
+       hal.get_value('plasmac.paused-motion-speed')) and \
+       not hal.get_value('plasmac.cut-recovery'):
         if orientation == 'portrait':
             w(fpausedmotion + '.reverse','configure','-state','normal')
             w(fpausedmotion + '.forward','configure','-state','normal')
