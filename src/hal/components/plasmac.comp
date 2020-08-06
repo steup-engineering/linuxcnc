@@ -1240,7 +1240,7 @@ FUNCTION(_) {
                     height_ovr_old = 0;
                     if(consumable_change){
                         state = CONSUMABLE_CHANGE_ON;
-                    }else if(cut_recovery){
+                    }else if(cut_recovery && stop_type != STOP){
                         state = CUT_RECOVERY_ON;
                     }else{
                         state = FINISH;
