@@ -24,14 +24,30 @@
 .\"
 .TH MDI "1"  "2020-08-26" "LinuxCNC Documentation" "The Enhanced Machine Controller"
 .SH NAME
-mdi \- short description
+mdi \- Send G-code commands from the terminal to the running LinuxCNC
+instance
 .SH SYNOPSIS
 .B mdi
 
 .SH DESCRIPTION
-\fBmdi\fR does stuff for LinuxCNC
+\fBmdi\fR sends G-code commands to LinuxCNC. 
+The command starts an envirmonemt in which G-code commands are sent to
+the interpreter and machine feedback is displayed. 
 
-FIXME: Add relevant content
+.SH USAGE
+
+ send a single command and exit
+ mdi m2 s1400
+
+ interactive session
+ $mdi
+ MDI> m3 s1000
+ MDI> G0 X100
+ MDI> ^Z
+ $stopped
+ 
+ 
+ 
 
 .SH "SEE ALSO"
 \fBLinuxCNC(1)\fR
