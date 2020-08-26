@@ -24,14 +24,22 @@
 .\"
 .TH INIVAR "1"  "2020-08-26" "LinuxCNC Documentation" "The Enhanced Machine Controller"
 .SH NAME
-inivar \- short description
+inivar \- Query an INI file
 .SH SYNOPSIS
-.B inivar
+.B inivar -var <variable> {-sec <section>} {<-ini inifile>}
 
 .SH DESCRIPTION
 \fBinivar\fR does stuff for LinuxCNC
 
-FIXME: Add relevant content
+Prints to stdout the INI file result of a variable-in-section
+search, useful for scripts that want to pick things out of INI files.
+
+syntax:  inivar -var <variable> {-sec <section>} {<-ini inifile>}
+
+Uses emc.ini as default. <variable> needs to be supplied. If <section>
+is omitted, first instance of <variable> will be looked for in any
+section. Otherwise only a match of the variable in <section> will
+be returned.
 
 .SH "SEE ALSO"
 \fBLinuxCNC(1)\fR

@@ -24,16 +24,24 @@
 .\"
 .TH IOV2 "1"  "2020-08-26" "LinuxCNC Documentation" "The Enhanced Machine Controller"
 .SH NAME
-iov2 \- short description
+iov2 \- an alternative to iocontrol
 .SH SYNOPSIS
-.B iov2
+.B EMCIO = iov2
 
 .SH DESCRIPTION
-\fBiov2\fR does stuff for LinuxCNC
+\fBiov2\fR is an alternative interface to io. 
 
-FIXME: Add relevant content
+io is documented here:
+.nf http://linuxcnc.org/docs/2.7/html/man/man1/iocontrol.1.html
+
+iov2 creates the same pins but does some things differently. 
+
+iov2 can be chosen in the INI file [EMCIO] section by using 
+[EMCIO]
+EMCIO = iov2
 
 .SH "SEE ALSO"
+\fBio(1)\fR
 \fBLinuxCNC(1)\fR
 
 Much more information about LinuxCNC and HAL is available in the LinuxCNC

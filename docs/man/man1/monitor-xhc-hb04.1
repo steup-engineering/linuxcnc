@@ -24,16 +24,20 @@
 .\"
 .TH MONITOR-XHC-HB04 "1"  "2020-08-26" "LinuxCNC Documentation" "The Enhanced Machine Controller"
 .SH NAME
-monitor-xhc-hb04 \- short description
+monitor-xhc-hb04 \- monitors the XHC-HB04 pendant and warns of disconnection
 .SH SYNOPSIS
 .B monitor-xhc-hb04
 
 .SH DESCRIPTION
-\fBmonitor-xhc-hb04\fR does stuff for LinuxCNC
+\fBmonitor-xhc-hb04\fR is included to monitor disconnects and reconnects of the pendant.
+This script runs in the background and will pop up a message when the
+pendant is disconnected or reconnected.
 
-FIXME: Add relevant content
+Usage is optional; if used it is specified with ini file entry:
+  [APPLICATIONS]APP = monitor-xhc-hb04
 
 .SH "SEE ALSO"
+\fBxhc-hb04(1)\fR
 \fBLinuxCNC(1)\fR
 
 Much more information about LinuxCNC and HAL is available in the LinuxCNC
