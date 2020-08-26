@@ -24,14 +24,14 @@
 .\"
 .TH LINUXCNC_INFO "1"  "2020-08-26" "LinuxCNC Documentation" "The Enhanced Machine Controller"
 .SH NAME
-linuxcnc_info
+linuxcnc_info \- short description
 .SH SYNOPSIS
 .B linuxcnc_info
 
 .SH DESCRIPTION
-\fBlinuxcnc_info\fR does stuff for LinuxCNC
+\fBlinuxcnc_info\fR supplies information about the linuxcnc version and
+system info. It creates a text file and opens it in the default text editor. 
 
-FIXME: Add relevant content
 
 .SH "SEE ALSO"
 \fBLinuxCNC(1)\fR
@@ -42,7 +42,7 @@ and HAL User Manuals, found at /usr/share/doc/LinuxCNC/.
 .SH HISTORY
 
 .SH BUGS
-None known at this time. 
+It appears to hang until the text editor is closed.
 .PP
 .SH AUTHOR
 This man page written by andypugh, as part of the LinuxCNC project.

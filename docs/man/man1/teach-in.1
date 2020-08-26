@@ -24,14 +24,20 @@
 .\"
 .TH TEACH-IN "1"  "2020-08-26" "LinuxCNC Documentation" "The Enhanced Machine Controller"
 .SH NAME
-teach-in
+teach-in \- jog the machine to a position, and record the state
 .SH SYNOPSIS
-.B teach-in
+.B teach-in [> outfile]
 
 .SH DESCRIPTION
-\fBteach-in\fR does stuff for LinuxCNC
+\fBteach-in\fR is a script to learn set positions for later use by a
+script.
 
-FIXME: Add relevant content
+A dialog box is shown with options to choose the coordinate system. 
+each press of the "Learn" button outputs a line of text to stdout or the 
+file chosen at load time. 
+line format:
+line-no X Y Z flood mist lube spindle
+
 
 .SH "SEE ALSO"
 \fBLinuxCNC(1)\fR
