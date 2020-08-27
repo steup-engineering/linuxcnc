@@ -29,9 +29,23 @@ linuxcnc_var \- short description
 .B linuxcnc_var
 
 .SH DESCRIPTION
-\fBlinuxcnc_var\fR does stuff for LinuxCNC
+\fBlinuxcnc_var\fR Retrieve LinuxCNC variables
 
-FIXME: Add relevant content
+
+
+Usage:
+      linuxcnc_var [ varname | all ]
+
+Varnames supported:
+         LINUXCNCVERSION
+         LINUXCNC_AUX_GLADEVCP
+         LINUXCNC_AUX_EXAMPLES
+         REALTIME
+         RTS
+         HALLIB_DIR
+
+Option 'all' returns varname=value for all supported varnames
+
 
 .SH "SEE ALSO"
 \fBLinuxCNC(1)\fR
