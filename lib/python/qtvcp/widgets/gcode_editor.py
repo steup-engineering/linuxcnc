@@ -130,7 +130,7 @@ class GcodeLexer(QsciLexerCustom):
                 editor.SendScintilla(
                     editor.SCI_GETTEXTRANGE, start, end, source)
             else:
-                source = str(editor.text()).encode('utf-8')[start:end]
+                source = str(editor.text())[start:end]
         if not source:
             return
 
@@ -146,45 +146,46 @@ class GcodeLexer(QsciLexerCustom):
 
         set_style = self.setStyling
         self.startStyling(start, 0x1f)
-
-        # scintilla always asks to style whole lines
-        for line in source.splitlines(True):
-            #print line
-            length = len(line)
-            graymode = False
-            msg = ('msg' in line.lower() or 'debug' in line.lower())
-            for char in str(line):
-                #print char
-                if char == ('('):
-                    graymode = True
-                    set_style(1, self.Comment)
-                    continue
-                elif char == (')'):
-                    graymode = False
-                    set_style(1, self.Comment)
-                    continue
-                elif graymode:
-                    if (msg and char.lower() in ('m', 's', 'g', ',', 'd', 'e', 'b', 'u')):
-                        set_style(1, self.Assignment)
-                        if char == ',': msg = False
-                    else:
+        try:
+            # scintilla always asks to style whole lines
+            for line in source.splitlines(True):
+                #print (line.decode('utf-8'))
+                graymode = False
+                line = line.decode('utf-8')
+                msg = ('msg' in line.lower() or 'debug' in line.lower())
+                for char in line:
+                    #print (char,msg)
+                    if char == ('('):
+                        graymode = True
                         set_style(1, self.Comment)
-                    continue
-                elif char in ('%', '<', '>', '#', '='):
-                    state = self.Assignment
-                elif char in ('[', ']'):
-                    state = self.Value
-                elif char.isalpha():
-                    state = self.Key
-                elif char.isdigit():
-                    state = self.Default
-                else:
-                    state = self.Default
-                set_style(1, state)
+                        continue
+                    elif char == (')'):
+                        graymode = False
+                        set_style(1, self.Comment)
+                        continue
+                    elif graymode:
+                        if (msg and char.lower() in ('m', 's', 'g', ',', 'd', 'e', 'b', 'u')):
+                            set_style(1, self.Assignment)
+                            if char == ',': msg = False
+                        else:
+                            set_style(1, self.Comment)
+                        continue
+                    elif char in ('%', '<', '>', '#', '='):
+                        state = self.Assignment
+                    elif char in ('[', ']'):
+                        state = self.Value
+                    elif char.isalpha():
+                        state = self.Key
+                    elif char.isdigit():
+                        state = self.Default
+                    else:
+                        state = self.Default
+                    set_style(1, state)
 
-            # folding implementation goes here
-            index += 1
-
+                # folding implementation goes here
+                index += 1
+        except Exception as e:
+            print(e)
 
 ##########################################################
 # Base editor class
