@@ -3,10 +3,7 @@ import linuxcnc
 import hal, hal_glib
 import time
 from PyQt5 import QtCore, QtWidgets, QtGui
-try:
-    from PyQt5.QtWebKitWidgets import QWebView
-except ImportError:
-    raise Exception("Qtvcp error with qtdragon - is package python-pyqt5.qtwebkit installed?")
+
 from qtvcp.widgets.gcode_editor import GcodeEditor as GCODE
 from qtvcp.widgets.mdi_line import MDILine as MDI_WIDGET
 from qtvcp.widgets.tool_offsetview import ToolOffsetView as TOOL_TABLE
@@ -138,19 +135,20 @@ class HandlerClass:
     def init_pins(self):
         # spindle control pins
         pin = self.h.newpin("spindle_amps", hal.HAL_FLOAT, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.spindle_pwr_changed)
+        pin.value_changed.connect(self.spindle_pwr_changed)
+
         pin = self.h.newpin("spindle_volts", hal.HAL_FLOAT, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.spindle_pwr_changed)
+        pin.value_changed.connect( self.spindle_pwr_changed)
         pin = self.h.newpin("spindle_fault", hal.HAL_U32, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.spindle_fault_changed)
+        pin.value_changed.connect(self.spindle_fault_changed)
         pin = self.h.newpin("modbus-errors", hal.HAL_U32, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.mb_errors_changed)
+        pin.value_changed.connect( self.mb_errors_changed)
         # external offset control pins
         self.h.newpin("eoffset_enable", hal.HAL_BIT, hal.HAL_OUT)
         self.h.newpin("eoffset_clear", hal.HAL_BIT, hal.HAL_OUT)
         self.h.newpin("eoffset_count", hal.HAL_S32, hal.HAL_OUT)
         pin = self.h.newpin("eoffset_value", hal.HAL_FLOAT, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.eoffset_changed)
+        pin.value_changed.connect(self.eoffset_changed)
 
     def init_preferences(self):
         if not self.w.PREFS_:
@@ -235,10 +233,11 @@ class HandlerClass:
         # clickable frames
         self.w.frame_cycle_start.mousePressEvent = self.btn_start_clicked
         self.w.frame_home_all.mousePressEvent = self.btn_home_all_clicked
+        
         # web view widget for SETUP page
-        self.web_view = QWebView()
-        self.w.verticalLayout_setup.addWidget(self.web_view)
-        self.web_view.setHtml(self.html)
+        self.w.verticalLayout_setup.addWidget(self.w.web_view)
+        self.w.web_view.setHtml(self.html)
+        
         # check for virtual keyboard enabled
         if self.w.chk_use_virtual.isChecked():
             self.w.btn_keyboard.show()
@@ -707,7 +706,7 @@ class HandlerClass:
             self.add_status("Loaded program file : {}".format(fname))
             self.w.main_tab_widget.setCurrentIndex(TAB_MAIN)
         elif fname.endswith(".html"):
-            self.web_view.load(QtCore.QUrl.fromLocalFile(fname))
+            self.w.web_view.load(QtCore.QUrl.fromLocalFile(fname))
             self.add_status("Loaded HTML file : {}".format(fname))
             self.w.main_tab_widget.setCurrentIndex(TAB_SETUP)
             self.w.btn_setup.setChecked(True)
