@@ -1,6 +1,6 @@
 import os
 import linuxcnc
-import hal, hal_glib
+import hal
 import time
 from PyQt5 import QtCore, QtWidgets, QtGui
 
