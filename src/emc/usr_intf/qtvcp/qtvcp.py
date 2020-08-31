@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from __future__ import print_function
+
 import os
 import sys
 import shutil
@@ -116,7 +116,7 @@ class QTVCP:
             # International translation
             locale.setlocale(locale.LC_ALL, '')
             locale.bindtextdomain(PATH.DOMAIN, PATH.LOCALEDIR)
-            gettext.install(PATH.DOMAIN, localedir=PATH.LOCALEDIR, unicode=True)
+            gettext.install(PATH.DOMAIN, localedir=PATH.LOCALEDIR)
             gettext.bindtextdomain(PATH.DOMAIN, PATH.LOCALEDIR)
 
             # if no handler file specified, use stock test one
