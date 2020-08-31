@@ -165,7 +165,7 @@ class  GCodeGraphics(Lcnc_3dGraphics, _HalWidgetBase):
             self.load(self._reload_filename)
             STATUS.emit('graphics-gcode-properties',self.gcode_properties)
         except:
-            print 'error', self._reload_filename
+            print('error', self._reload_filename)
             pass
 
 

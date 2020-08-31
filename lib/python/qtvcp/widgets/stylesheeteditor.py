@@ -111,7 +111,7 @@ class StyleSheetEditor(QDialog):
                 item.setData(os.path.join(qssname, i), role = QtCore.Qt.UserRole + 1)
                 model.appendRow(item)
         except Exception as e:
-            print e
+            print(e)
 
         # check for qss in the users's config folder 
         localqss = PATH.CONFIGPATH
@@ -122,7 +122,7 @@ class StyleSheetEditor(QDialog):
                 item.setData(os.path.join(localqss, i), role = QtCore.Qt.UserRole + 1)
                 model.appendRow(item)
         except Exception as e:
-            print e
+            print(e)
 
     def selectionChanged(self,i):
         path = self.styleSheetCombo.itemData(i,role = QtCore.Qt.UserRole + 1)
@@ -165,7 +165,7 @@ class StyleSheetEditor(QDialog):
             styleSheet = file.readAll()
             try:
                 # Python v2.
-                styleSheet = unicode(styleSheet, encoding='utf8')
+                styleSheet = str(styleSheet, encoding='utf8')
             except NameError:
                 # Python v3.
                 styleSheet = str(styleSheet, encoding='utf8')
@@ -224,7 +224,7 @@ class StyleSheetEditor(QDialog):
             styleSheet = file.readAll()
             try:
                 # Python v2.
-                styleSheet = unicode(styleSheet, encoding='utf8')
+                styleSheet = str(styleSheet, encoding='utf8')
             except NameError:
                 # Python v3.
                 styleSheet = str(styleSheet, encoding='utf8')

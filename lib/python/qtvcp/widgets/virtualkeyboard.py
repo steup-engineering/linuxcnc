@@ -163,7 +163,7 @@ class VirtualKeyboard(QtWidgets.QWidget):
             for val in self.number_list:
                 alt_txt = self['btn_' + val].property('fcode')
                 self['btn_' + val].setText(alt_txt)
-            for key, val in self.function_keys.items():
+            for key, val in list(self.function_keys.items()):
                 self['btn_' + key].KEY_CHAR = val
         else:
             self.init_numbers()

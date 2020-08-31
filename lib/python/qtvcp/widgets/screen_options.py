@@ -418,7 +418,7 @@ class ScreenOptions(QtWidgets.QWidget, _HalWidgetBase):
             try:
                 temp = XEmbeddable()
                 temp.embed(cmd)
-            except Exception, e:
+            except Exception as e:
                 LOG.error('Embedded tab loading failed: {} {}'.format(cmd,e))
             else:
                 if twidget is not None:
@@ -428,7 +428,7 @@ class ScreenOptions(QtWidgets.QWidget, _HalWidgetBase):
                             self.QTVCP_INSTANCE_[loc].setMinimumSize(400,0)
                         layout = QtWidgets.QGridLayout(twidget)
                         layout.addWidget(temp, 0, 0)
-                    except Exception, e:
+                    except Exception as e:
                         LOG.error('Embedded tab adding widget into {} failed.'.format(loc))
                 else:
                     layout = QtWidgets.QGridLayout(tw)

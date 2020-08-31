@@ -196,7 +196,7 @@ class BasicProbe(QtWidgets.QWidget, _HalWidgetBase):
         self.parse_input(line)
 
     def process_finished(self, exitCode, exitStatus):
-        print("Probe Process signals finished exitCode {} exitStatus {}".format(exitCode, exitStatus))
+        print(("Probe Process signals finished exitCode {} exitStatus {}".format(exitCode, exitStatus)))
 
     def parse_input(self, line):
         self.process_busy = False

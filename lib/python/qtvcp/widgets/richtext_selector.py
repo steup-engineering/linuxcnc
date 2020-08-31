@@ -344,7 +344,7 @@ class MainWindow(QMainWindow):
             self.update_title()
 
     def file_print(self):
-        print self.editor.toHtml()
+        print(self.editor.toHtml())
 
     def update_title(self):
         self.setWindowTitle("%s - Megasolid Idiom" % (os.path.basename(self.path) if self.path else "Untitled"))
@@ -386,7 +386,7 @@ class RichTextEditorDialog(QDialog):
 if __name__ == '__main__':
 
     def p():
-        print window.editor.toHtml()
+        print(window.editor.toHtml())
         app.exit()
 
     app = QApplication(sys.argv)

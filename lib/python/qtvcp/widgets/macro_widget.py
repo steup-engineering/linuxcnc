@@ -226,7 +226,7 @@ class MacroTab(QtWidgets.QWidget, _HalWidgetBase):
                         self['sw%d' % i] = CustomSVG(svgpath,  int(img_info[1]))
                     else:
                         try:
-                            print self[tName][1][1]
+                            print(self[tName][1][1])
                             imgpath = os.path.join(path, self[tName][1][1])
                         except:
                             imgpath = os.path.join(path, img_info[0])
@@ -465,7 +465,7 @@ class MacroTab(QtWidgets.QWidget, _HalWidgetBase):
             readLine = file.readLine()
             try:
                 # Python v2.
-                readLine = unicode(readLine, encoding='utf8')
+                readLine = str(readLine, encoding='utf8')
             except NameError:
                 # Python v3.
                 readLine = str(readLine, encoding='utf8')

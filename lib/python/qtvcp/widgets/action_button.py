@@ -493,7 +493,7 @@ class ActionButton(Indicated_PushButton, _HalWidgetBase):
                 try:
                     ACTION.SET_GRAPHICS_VIEW(self.view_type)
                 except Exception as e:
-                    print e
+                    print(e)
                     pass
         elif True in (self.spindle_fwd, self.spindle_rev):
             if self.spindle_fwd:

@@ -299,7 +299,7 @@ class VersaProbe(QtWidgets.QWidget, _HalWidgetBase):
             file = QtCore.QFile(HELP)
             file.open(QtCore.QFile.ReadOnly)
             html = file.readAll()
-            html = unicode(html, encoding='utf8')
+            html = str(html, encoding='utf8')
             html = html.replace("../images/probe_icons/","{}/probe_icons/".format(INFO.IMAGE_PATH))
             t.setHtml(html)
         except Exception as e:
