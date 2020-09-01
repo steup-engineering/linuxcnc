@@ -151,7 +151,7 @@ class VersaProbe(QtWidgets.QWidget, _HalWidgetBase):
         self.proc.readyReadStandardOutput.connect(self.read_stdout)
         self.proc.readyReadStandardError.connect(self.read_stderror)
         self.proc.finished.connect(self.process_finished)
-        self.proc.start('python {}'.format(SUBPROGRAM))
+        self.proc.start('python3 {}'.format(SUBPROGRAM))
         # send our PID so subprogram can check to see if it is still running 
         self.proc.writeData(bytes('PiD_ {}\n'.format(os.getpid()), 'utf-8'))
 
@@ -211,7 +211,7 @@ class VersaProbe(QtWidgets.QWidget, _HalWidgetBase):
 
     def send_error(self, w, kind, text):
         message ='_ErroR_ {},{} \n'.format(kind,text)
-        self.proc.writeData(message)
+        self.proc.writeData(bytes(message, 'utf-8'))
 
 #####################################################
 # button callbacks

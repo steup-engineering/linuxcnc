@@ -16,6 +16,8 @@
 # a probe screen based on ProbeBasic screen
 
 import sys
+sys.stdout.write("[ERROR] : {}\n".format(sys.version))
+sys.stdout.flush()
 import os
 from PyQt5.QtCore import QObject
 from qtvcp.core import Action
