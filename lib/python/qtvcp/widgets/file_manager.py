@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys, os
 from PyQt5.QtWidgets import (QApplication, QFileSystemModel,
                  QWidget, QVBoxLayout, QHBoxLayout, QListView,

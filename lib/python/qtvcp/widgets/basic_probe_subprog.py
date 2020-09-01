@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Qtvcp basic probe
 #
 # Copyright (c) 2020  Chris Morley <chrisinnanaimo@hotmail.com>
