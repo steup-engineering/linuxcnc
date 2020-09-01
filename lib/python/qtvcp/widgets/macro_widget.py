@@ -41,7 +41,7 @@ if not INFO.LINUXCNC_IS_RUNNING:
 try:
     from PyQt5 import QtSvg
 except:
-    LOG.critical("Qtvcp error with macro_widget - is package python-pyqt5.qtsvg installed?")
+    LOG.critical("Qtvcp error with macro_widget - is package python3-pyqt5.qtsvg installed?")
 
 ###############################################################
 # helper widget for SVG display on Button

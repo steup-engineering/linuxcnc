@@ -38,7 +38,7 @@ LIB_GOOD = True
 try:
     import cv2
 except:
-    LOG.error('Qtvcp Error with camview - is python-opencv installed?')
+    LOG.error('Qtvcp Error with camview - is python3-opencv installed?')
     LIB_GOOD = False
 
 
