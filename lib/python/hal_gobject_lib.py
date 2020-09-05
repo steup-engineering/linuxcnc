@@ -6,7 +6,12 @@ import linuxcnc
 import os
 import math
 
-from gi.repository import GObject
+import sys
+if sys.version_info.major > 2:
+    from gi.repository import GObject
+else:
+    import gobject as GObject
+    GObject.Object = GObject.GObject
 
 # constants
 JOGJOINT  = 1
