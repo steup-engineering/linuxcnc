@@ -10,7 +10,7 @@ else: import gobject as GObject
 
 import _hal, hal
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
-from hal_gobject_lib import GStat
+from hal_glib import GStat
 from qtvcp.qt_istat import _IStat as IStatParent
 
 # Set up logging
