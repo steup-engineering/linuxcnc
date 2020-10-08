@@ -519,6 +519,8 @@ struct Posix : RtapiApp
     int task_pause(int task_id);
     int task_resume(int task_id);
     int task_self();
+    long long task_pll_get_reference(void);
+    int task_pll_set_correction(long value);
     void wait();
     unsigned char do_inb(unsigned int port);
     void do_outb(unsigned char value, unsigned int port);
@@ -841,6 +843,10 @@ int Posix::task_start(int task_id, unsigned long int period_nsec)
   task->period = period_nsec;
   task->ratio = period_nsec / period;
 
+  // limit PLL correction values to +/-1% of cycle time
+  task->pll_correction_limit = period_nsec / 100;
+  task->pll_correction = 0;
+
   struct sched_param param;
   memset(&param, 0, sizeof(param));
   param.sched_priority = task->prio;
@@ -917,7 +923,7 @@ void *Posix::wrapper(void *arg)
 
   struct timespec now;
   clock_gettime(RTAPI_CLOCK, &now);
-  advance_clock(task->nextstart, now, task->period);
+  advance_clock(task->nextstart, now, task->period + task->pll_correction);
 
   /* call the task function with the task argument */
   (task->taskcode) (task->arg);
@@ -940,6 +946,21 @@ int Posix::task_self() {
     return task - task_array;
 }
 
+long long Posix::task_pll_get_reference(void) {
+    struct rtapi_task *task = reinterpret_cast<rtapi_task*>(pthread_getspecific(key));
+    if(!task) return 0;
+    return task->nextstart.tv_sec * 1000000000LL + task->nextstart.tv_nsec;
+}
+
+int Posix::task_pll_set_correction(long value) {
+    struct rtapi_task *task = reinterpret_cast<rtapi_task*>(pthread_getspecific(key));
+    if(!task) return -EINVAL;
+    if (value > task->pll_correction_limit) value = task->pll_correction_limit;
+    if (value < -(task->pll_correction_limit)) value = -(task->pll_correction_limit);
+    task->pll_correction = value;
+    return 0;
+}
+
 static bool ts_less(const struct timespec &ta, const struct timespec &tb) {
     if(ta.tv_sec < tb.tv_sec) return 1;
     if(ta.tv_sec > tb.tv_sec) return 0;
@@ -951,7 +972,7 @@ void Posix::wait() {
         pthread_mutex_unlock(&thread_lock);
     pthread_testcancel();
     struct rtapi_task *task = reinterpret_cast<rtapi_task*>(pthread_getspecific(key));
-    advance_clock(task->nextstart, task->nextstart, task->period);
+    advance_clock(task->nextstart, task->nextstart, task->period + task->pll_correction);
     struct timespec now;
     clock_gettime(RTAPI_CLOCK, &now);
     if(ts_less(task->nextstart, now))
@@ -1049,6 +1070,16 @@ int rtapi_task_resume(int task_id)
 int rtapi_task_self()
 {
     return App().task_self();
+}
+
+long long rtapi_task_pll_get_reference(void)
+{
+    return App().task_pll_get_reference();
+}
+
+int rtapi_task_pll_set_correction(long value)
+{
+    return App().task_pll_set_correction(value);
 }
 
 void rtapi_wait(void)
