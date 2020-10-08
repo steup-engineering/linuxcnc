@@ -256,7 +256,17 @@ void do_homing(void)
 		/* reset delay counter */
 		joint->home_pause_timer = 0;
 		/* figure out exactly what homing sequence is needed */
-		if (joint->home_flags & HOME_UNLOCK_FIRST) {
+		if (joint->home_flags & HOME_IS_ABSOLUTE) {
+		  offset = joint->home_offset - joint->motor_offset;
+		  /* this moves the internal position but does not affect the
+		     motor position */
+		  joint->pos_cmd += offset;
+		  joint->pos_fb += offset;
+		  joint->free_pos_cmd += offset;
+		  joint->motor_offset = joint->home_offset;
+		  joint->home_state = (joint->home_final_vel == 0.0) ? HOME_LOCK : HOME_FINAL_MOVE_START;
+		  immediate_state = 1;
+		} else if (joint->home_flags & HOME_UNLOCK_FIRST) {
 		    joint->home_state = HOME_UNLOCK;
 		} else {
 		    joint->home_state = HOME_UNLOCK_WAIT;

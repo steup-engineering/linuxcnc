@@ -1722,6 +1722,7 @@ static int emcTaskIssueCommand(NMLmsg * cmd)
 					set_homing_params_msg->use_index,
 					set_homing_params_msg->ignore_limits,
 					set_homing_params_msg->is_shared,
+					set_homing_params_msg->is_absolute,
 					set_homing_params_msg->home_sequence,
 					set_homing_params_msg->volatile_home,
                                         set_homing_params_msg->locking_indexer);

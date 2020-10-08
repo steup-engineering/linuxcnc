@@ -265,6 +265,7 @@ class EMC_AXIS_SET_HOMING_PARAMS:public EMC_AXIS_CMD_MSG {
     int use_index;
     int ignore_limits;
     int is_shared;
+    int is_absolute;
     int home_sequence;
     int volatile_home;
     int locking_indexer;
