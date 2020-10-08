@@ -796,6 +796,8 @@ obj-$(CONFIG_STREAMER) += streamer.o
 streamer-objs := hal/components/streamer.o $(MATHSTUB)
 obj-$(CONFIG_SAMPLER) += sampler.o
 sampler-objs := hal/components/sampler.o $(MATHSTUB)
+obj-$(CONFIG_RETAIN) += retain.o
+retain-objs := hal/components/retain.o $(MATHSTUB)
 
 # Subdirectory: hal/drivers
 obj-$(CONFIG_HAL_PARPORT) += hal_parport.o
@@ -1063,6 +1065,7 @@ endif
 ../rtlib/hal_ppmc$(MODULE_EXT): $(addprefix objects/rt,$(hal_ppmc-objs))
 ../rtlib/hm2_eth$(MODULE_EXT): $(addprefix objects/rt,$(hm2_eth-objs))
 ../rtlib/hm2_spi$(MODULE_EXT): $(addprefix objects/rt,$(hm2_spi-objs))
+../rtlib/retain$(MODULE_EXT): $(addprefix objects/rt,$(retain-objs))
 
 ifeq ($(TRIVIAL_BUILD),no)
 READ_RTDEPS = $(wildcard $(RTDEPS))
