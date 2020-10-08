@@ -115,6 +115,7 @@ Interp::Interp()
 {
     _setup.init_once = 1;  
     init_named_parameters();  // need this before Python init.
+    i18n_re = NULL;
  
     if (!PythonPlugin::instantiate(builtin_modules)) {  // factory
 	Error("Interp ctor: cant instantiate Python plugin");
@@ -165,6 +166,7 @@ Interp::~Interp() {
             fclose(log_file);
 	log_file = 0;
     }
+    i18n_cleanup();
 }
 
 void Interp::doLog(unsigned int flags, const char *file, int line,
@@ -1221,6 +1223,8 @@ int Interp::init()
   }
   _setup.init_once = 0;
   
+  i18n_init();
+
   return INTERP_OK;
 }
 
@@ -2472,20 +2476,25 @@ int Interp::on_abort(int reason, const char *message)
 // config file parsing (REMAP... ngc=<basename>)
 FILE *Interp::find_ngc_file(setup_pointer settings,const char *basename, char *foundhere )
 {
-    FILE *newFP;
     char tmpFileName[PATH_MAX+1];
-    char newFileName[PATH_MAX+1];
-    char foundPlace[PATH_MAX+1];
-    int  dct;
 
     // look for a new file
     sprintf(tmpFileName, "%s.ngc", basename);
+    return find_file(settings, tmpFileName, foundhere);
+}
+
+FILE *Interp::find_file(setup_pointer settings,char *filename, char *foundhere )
+{
+    FILE *newFP;
+    char newFileName[PATH_MAX+1];
+    char foundPlace[PATH_MAX+1];
+    int  dct;
 
     // find subroutine by search: program_prefix, subroutines, wizard_root
     // use first file found
 
     // first look in the program_prefix place
-    sprintf(newFileName, "%s/%s", settings->program_prefix, tmpFileName);
+    sprintf(newFileName, "%s/%s", settings->program_prefix, filename);
     newFP = fopen(newFileName, "r");
 
     // then look in the subroutines place
@@ -2493,7 +2502,7 @@ FILE *Interp::find_ngc_file(setup_pointer settings,const char *basename, char *f
 	for (dct = 0; dct < MAX_SUB_DIRS; dct++) {
 	    if (!settings->subroutines[dct])
 		continue;
-	    sprintf(newFileName, "%s/%s", settings->subroutines[dct], tmpFileName);
+	    sprintf(newFileName, "%s/%s", settings->subroutines[dct], filename);
 	    newFP = fopen(newFileName, "r");
 	    if (newFP) {
 		// logOword("fopen: |%s|", newFileName);
@@ -2504,12 +2513,12 @@ FILE *Interp::find_ngc_file(setup_pointer settings,const char *basename, char *f
     // if not found, search the wizard tree
     if (!newFP) {
 	int ret;
-	ret = findFile(settings->wizard_root, tmpFileName, foundPlace);
+	ret = findFile(settings->wizard_root, filename, foundPlace);
 
 	if (INTERP_OK == ret) {
 	    // create the long name
 	    sprintf(newFileName, "%s/%s",
-		    foundPlace, tmpFileName);
+		    foundPlace, filename);
 	    newFP = fopen(newFileName, "r");
 	}
     }

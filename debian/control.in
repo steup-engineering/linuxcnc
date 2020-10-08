@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 6),
     libglu1-mesa-dev, libgl1-mesa-dev | libgl1-mesa-swx11-dev,
     libgtk2.0-dev, gettext, autoconf, libboost-python-dev,
     texlive-lang-cyrillic, texlive-lang-french,
-    texlive-lang-spanish, texlive-lang-german, netcat,
+    texlive-lang-spanish, texlive-lang-german, netcat, libpcre3-dev,
     libmodbus-dev (>= 3.0), libusb-1.0-0-dev, procps, psmisc,
     graphviz, inkscape,
     intltool,
@@ -55,7 +55,7 @@ Depends: ${shlibs:Depends}, @KERNEL_DEPENDS@,
     python-vte,
     @PYTHON_GST@,
     python-xlib, python-gtkglext1, python-configobj,
-    tclreadline, procps, psmisc, module-init-tools | kmod, tclx,
+    tclreadline, procps, psmisc, libpcre3, module-init-tools | kmod, tclx,
     mesa-utils, blt
 Description: motion controller for CNC machines and robots
  LinuxCNC is the next-generation Enhanced Machine Controller which

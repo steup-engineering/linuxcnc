@@ -19,8 +19,10 @@
 #include "config.h"
 #include <limits.h>
 #include <stdio.h>
+#include <pcre.h>
 #include <set>
 #include <map>
+#include <string>
 #include <bitset>
 #include "canon.hh"
 #include "emcpos.h"
