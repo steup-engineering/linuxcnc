@@ -1049,6 +1049,11 @@ int USER_DEFINED_FUNCTION_ADD(USER_DEFINED_FUNCTION_TYPE func, int num)
   return 0;
 }
 
+double GET_USER_DEFINED_RESULT()
+{
+  return 0.0;
+}
+
 void SET_MOTION_OUTPUT_BIT(int index)
 {
     PRINT1("SET_MOTION_OUTPUT_BIT(%d)\n", index);

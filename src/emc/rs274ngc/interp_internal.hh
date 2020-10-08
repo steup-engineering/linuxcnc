@@ -710,6 +710,7 @@ typedef struct setup_struct
   bool probe_flag;            // flag indicating probing done
   bool input_flag;            // flag indicating waiting for input done
   bool toolchange_flag;       // flag indicating we just had a tool change
+  bool user_defined_flag;     // flag indicating we just had called a user defined function
   int input_index;		// channel queried
   bool input_digital;		// input queried was digital (false=analog)
   bool cutter_comp_firstmove; // this is the first comp move
