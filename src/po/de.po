@@ -5723,6 +5723,10 @@ msgstr "Spindelübersteuerung:"
 msgid "%"
 msgstr "%"
 
+#: share/axis/tcl/axis.tcl:1727
+msgid "Rapid Override:"
+msgstr "Eilgang Übersteuerung:"
+
 #: share/axis/tcl/axis.tcl:1711
 #, fuzzy
 msgid ""
