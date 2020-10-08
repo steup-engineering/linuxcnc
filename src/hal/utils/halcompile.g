@@ -622,7 +622,11 @@ static int comp_id;
 
         if options.get("userspace"):
             print("#undef FOR_ALL_INSTS", file=f)
-            print("#define FOR_ALL_INSTS() struct __comp_state *__comp_inst; for(__comp_inst = __comp_first_inst; __comp_inst; __comp_inst = __comp_inst->_next)", file=f)
+            if options.get("singleton"):
+                print("#define __comp_inst __comp_first_inst", file=f)
+                print("#define FOR_ALL_INSTS()", file=f)
+            else:
+                print("#define FOR_ALL_INSTS() struct __comp_state *__comp_inst; for(__comp_inst = __comp_first_inst; __comp_inst; __comp_inst = __comp_inst->_next)", file=f)
     print(file=f)
     print(file=f)
 
