@@ -1783,7 +1783,7 @@ int Interp::restore_parameters(const char *filename)   //!< name of parameter fi
   index = 0;
   required = _required_parameters[index++];
   while (feof(infile) == 0) {
-    if (fgets(line, 256, infile) == NULL) {
+    if (fgets(line, sizeof(line), infile) == NULL) {
       break;
     }
     // try for a variable-value match in the file
@@ -1856,7 +1856,8 @@ int Interp::save_parameters(const char *filename,      //!< name of file to writ
 {
   FILE *infile;
   FILE *outfile;
-  char line[PATH_MAX];
+  char tmpfile[PATH_MAX];
+  char line[256];
   int variable;
   double value;
   int required;                 // number of next required parameter
@@ -1865,29 +1866,26 @@ int Interp::save_parameters(const char *filename,      //!< name of file to writ
 
   if(access(filename, F_OK)==0) 
   {
-    // rename as .bak
-    int r;
-    r = snprintf(line, sizeof(line), "%s%s", filename, RS274NGC_PARAMETER_FILE_BACKUP_SUFFIX);
-    CHKS((r >= (int)sizeof(line)), NCE_CANNOT_CREATE_BACKUP_FILE);
-    CHKS((rename(filename, line) != 0), NCE_CANNOT_CREATE_BACKUP_FILE);
-
-    // open backup for reading
-    infile = fopen(line, "r");
-    CHKS((infile == NULL), NCE_CANNOT_OPEN_BACKUP_FILE);
+    // open original for reading
+    infile = fopen(filename, "r");
+    CHKS((infile == NULL), NCE_CANNOT_OPEN_VARIABLE_FILE);
   } else {
     // it's OK if the parameter file doesn't exist yet
     // it will now be created with a default list of parameters
-    infile = fopen("/dev/null", "r");
+    infile = NULL;
   }
-  // open original for writing
-  outfile = fopen(filename, "w");
-  CHKS((outfile == NULL), NCE_CANNOT_OPEN_VARIABLE_FILE);
+
+  // open temp file for writing
+  CHKS((snprintf(tmpfile, sizeof(tmpfile), "%s%s", filename, RS274NGC_PARAMETER_FILE_BACKUP_SUFFIX)
+      >= (int) sizeof(tmpfile)), NCE_CANNOT_CREATE_BACKUP_FILE);
+  outfile = fopen(tmpfile, "w");
+  CHKS((outfile == NULL), NCE_CANNOT_OPEN_BACKUP_FILE);
 
   k = 0;
   index = 0;
   required = _required_parameters[index++];
-  while (feof(infile) == 0) {
-    if (fgets(line, 256, infile) == NULL) {
+  while (infile != NULL && feof(infile) == 0) {
+    if (fgets(line, sizeof(line), infile) == NULL) {
       break;
     }
     // try for a variable-value match
@@ -1916,7 +1914,9 @@ int Interp::save_parameters(const char *filename,      //!< name of file to writ
       }
     }
   }
-  fclose(infile);
+  if (infile != NULL) {
+    fclose(infile);
+  }
   for (; k < RS274NGC_MAX_PARAMETERS; k++) {
     if (k == required) {
       sprintf(line, "%d\t%f\n", k, parameters[k]);
@@ -1924,7 +1924,15 @@ int Interp::save_parameters(const char *filename,      //!< name of file to writ
       required = _required_parameters[index++];
     }
   }
+
+  // flush data and fs buffers
+  CHKS((fflush(outfile) != 0), NCE_CANNOT_CREATE_BACKUP_FILE);
+  CHKS((fdatasync(fileno(outfile)) != 0), NCE_CANNOT_CREATE_BACKUP_FILE);
   fclose(outfile);
+
+  // rename to original file
+  CHKS((rename(tmpfile, filename) != 0), NCE_CANNOT_OPEN_VARIABLE_FILE);
+
   return INTERP_OK;
 }
 
